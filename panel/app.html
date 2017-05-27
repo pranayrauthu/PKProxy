@@ -1,0 +1,22 @@
+<html>
+
+<head>
+    <script src="scripts/dom-utils.js"></script>
+</head>
+
+<body>
+    <h2>PK Proxy</h2>
+    <form>
+        <input type="url" id="filterUrl" value="" placeholder="URL to intercept" required>
+        <input type="url" id="redirectUrl" value="" placeholder="redirect to URL" required>
+        <button id="add-entry-btn">Add Entry</button>
+    </form>
+    <table id="intercepted-urls">
+        <tr><th>filter</th><th>redirect</th><th></th></tr>
+    </table>
+
+    <script src="panel.js"></script>
+    
+</body>
+
+</html>
