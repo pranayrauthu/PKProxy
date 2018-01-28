@@ -1,26 +1,33 @@
+/**
+ * 
+ * docs - https://developer.chrome.com/extensions/webRequest
+ */
+
+
 const beforeReqOptions = ["blocking"];
 
 //following variables gets updated
 //when "proxy-urls" in storage get updated
-var filters = {
+const filters = {
     urls: [
         "http://www.abc.com/*"
     ]
 }
+
 //array of objects({"filter":url<string>,"redirect":url<string>})
-var redirections = [{
-    filter:"http://www.abc.com",
-    redirect: "http://www.github.com/pranayrauthu"
+let redirections = [{
+    filterUrl:"http://www.abc.com/*",
+    redirectUrl: "http://www.github.com/pranayrauthu"
 }];
 
 function callback(info) {
-    var url = info.url;
-    
-    for (var i = redirections.length - 1; i >= 0; i--) {
-        if(url.includes(redirections[i]["filter"])){
-            url = redirections[i]["redirect"];
+    let url = info.url;
+
+    redirections.forEach(function (redirection, i) {
+        if(new RegExp(redirection.filterUrl).test(url)){
+            url = redirection.redirectUrl
         }
-    }
+    })
 
     return {
         redirectUrl: url
@@ -28,21 +35,18 @@ function callback(info) {
 };
 
 function updateRedirections(e) {
-    var filterUrl = e.filter;
-    // trimming '/*' at the end
-    filterUrl = filterUrl.substr(0,filterUrl.length-2);
     redirections.push({
-        filter:filterUrl,
-        redirect:e.redirect
+        filter:e.filterUrl,
+        redirect:e.redirectUrl
     });
 }
 
-chrome.storage.local.get("proxy-urls", function(data) {
-    var entries = data["proxy-urls"];
+chrome.storage.sync.get("proxy-urls", function(data) {
+    const entries = data["proxy-urls"] ||[];
     redirections = [];
     for (var entry of entries) {
         redirections.push(entry);
-        filters.urls.push(entry.filter)
+        filters.urls.push(entry.filterUrl)
     }
     chrome.webRequest.onBeforeRequest.addListener(callback, filters, beforeReqOptions);
 });
@@ -56,7 +60,7 @@ chrome.storage.onChanged.addListener(function(change, type) {
         filters.urls = [];
         redirections = [];
         for (var entry of newFilters) {
-            filters.urls.push(entry.filter);
+            filters.urls.push(entry.filterUrl);
             updateRedirections(entry)
         }
         chrome.webRequest.onBeforeRequest.removeListener(callback);

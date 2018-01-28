@@ -2,7 +2,8 @@
   "name": "PKProxy",
   "version": "0.0.1",
   "description": "Extends the Developer Tools, adding tools for web applications.",
-  "devtools_page": "devtoolsBackground.html",
+  // "devtools_page": "devtoolsBackground.html",
+  "options_page": "options.html",
   "manifest_version": 2,
   "permissions": [
     "tabs",
