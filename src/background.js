@@ -36,8 +36,8 @@ function callback(info) {
 
 function updateRedirections(e) {
     redirections.push({
-        filter:e.filterUrl,
-        redirect:e.redirectUrl
+        filterUrl:e.filterUrl,
+        redirectUrl:e.redirectUrl
     });
 }
 
@@ -52,7 +52,7 @@ chrome.storage.sync.get("proxy-urls", function(data) {
 });
 
 chrome.storage.onChanged.addListener(function(change, type) {
-    //proxy-urls -> array of objects {"filter":"","redirect":""}
+    //proxy-urls -> array of objects {"filterUrl":"","redirectUrl":""}
     //filter -> url to intercept
     //redirect -> redirect url
     var newFilters = change["proxy-urls"] ? change['proxy-urls']['newValue'] : [];

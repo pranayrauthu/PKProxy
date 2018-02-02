@@ -2,6 +2,8 @@ import React from "react";
 import { connect } from 'react-redux';
 import classnames from 'classnames';
 
+import { TextField } from 'rmwc/TextField';
+import { Button } from 'rmwc/Button';
 
 class OptionForm extends React.Component {
 
@@ -18,9 +20,9 @@ class OptionForm extends React.Component {
         this.addOptionToStore = this.addOptionToStore.bind(this);
     }
 
-    componentWillReceiveProps(nextProps){
+    componentWillReceiveProps(nextProps) {
         this.setState({
-            index: parseInt(nextProps.index)+1,
+            index: parseInt(nextProps.index) + 1,
             filterUrl: nextProps.filterUrl,
             redirectUrl: nextProps.redirectUrl,
             mode: nextProps.mode
@@ -34,60 +36,69 @@ class OptionForm extends React.Component {
     }
 
     addOptionToStore(e) {
-        if(this.state.mode === "EDIT"){
+        if (!this.validUrlPattern()) {
+            // TODO: show proper error message
+            alert('pls enter valid url pattern')
+            return;
+        }
+
+        if (this.state.mode === "EDIT") {
             this.props.updateEntry(this.state);
         }
-        else{
+        else {
             this.props.addEntry(this.state);
         }
         this.props.resetForm();
     }
 
+    validUrlPattern() {
+        let isValid = true;
+        const urlPattern = this.state.filterUrl.split('://');
+        if (urlPattern.length < 2) {
+            return false;
+        }
+        const scheme = urlPattern[0];
+        let host = urlPattern.filter((v, i) => i > 0).join('://');
+        host = host.split('/');
+        if (host.length < 2) {
+            return false;
+        }
+        host = host[0];
+        /**
+         * validate scheme
+         * 
+         * https://jex.im/regulex/#!flags=&re=(%5E%5C*%24)%7C(%5Ehttp%24)%7C(%5Ehttps%24)%7C(%5Efile%24)%7C(%5Eftp%24)
+         */
+        isValid = isValid && new RegExp('(^\\*$)|(^http$)|(^https$)|(^file$)|(^ftp$)').test(scheme);
+        /**
+         * validate host
+         * 
+         * https://jex.im/regulex/#!flags=&re=(%5E%5C*%24)%7C(%5E%5C*%5C.%5B%5E%5C%2F*%5D%2B%24)%7C(%5E((%5Ba-zA-Z0-9%5D%7C%5Ba-zA-Z0-9%5D%5Ba-zA-Z0-9%5C-%5D*%5Ba-zA-Z0-9%5D)%5C.)*(%5BA-Za-z0-9%5D%7C%5BA-Za-z0-9%5D%5BA-Za-z0-9%5C-%5D*%5BA-Za-z0-9%5D)%24)
+         */
+        isValid = isValid && new RegExp('(^\\*$)|(^\\*\\.[^\\/*]+$)|(^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$)').test(host);
+        return isValid;
+    }
+
     render() {
-        
+
         return (
             <div>
-                <div className={classnames("mdl-textfield", "mdl-js-textfield")}>
-                    <input
-                        className={classnames("mdl-textfield__input")}
-                        type={"text"} pattern={"-?[0-9]*(\.[0-9]+)?"}
-                        id={"opt-index"}
-                        readOnly
-                        value={this.state.index}
-                    />
-                    <label className={classnames("mdl-textfield__label")} htmlFor={"sample2"}>Index</label>
-                    <span className={classnames("mdl-textfield__error")}>Input is not a number!</span>
-                </div>
-                <div className={classnames("mdl-textfield", "mdl-js-textfield")}>
-                    <input
-                        className={classnames("mdl-textfield__input")}
-                        type={"text"}
-                        id={"filter-url"}
-                        onChange={(e) => this.updateState(e)}
-                        name={"filterUrl"}
-                        value={this.state.filterUrl}
-                    />
-                    <label className={classnames("mdl-textfield__label")} htmlFor={"filterUrl"}>URL to intercept</label>
-                </div>
-                <div className={classnames("mdl-textfield", "mdl-js-textfield")}>
-                    <input
-                        className={classnames("mdl-textfield__input")}
-                        type={"text"}
-                        id={"redirect-url"}
-                        onChange={this.updateState}
-                        name={"redirectUrl"}
-                        value={this.state.redirectUrl}
-                    />
-                    <label className={classnames("mdl-textfield__label")} htmlFor={"redirectUrl"}>URL to redirect</label>
-                </div>
+                <TextField
+                label="Index"
+                value={this.state.index}
+                disabled />
+                <TextField
+                    onChange={(e) => this.updateState(e)}
+                    value={this.state.filterUrl}
+                    label="URL pattern to intercept" />
+                <TextField
+                    onChange={this.updateState}
+                    value={this.state.redirectUrl}
+                    label="URL to redirect" />
                 <br />
-                <button
-                    id={"add-entry-btn"}
-                    className={classnames("mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent")}
-                    onClick={this.addOptionToStore}
-                >
+                <Button raised onClick={this.addOptionToStore}>
                     {this.state.mode} Entry
-                </button>
+                </Button>
                 <p>please check <a href="https://developer.chrome.com/apps/match_patterns" target="_blank">rules</a> for url patterns.</p>
             </div>
         )
@@ -114,7 +125,7 @@ const mapDispatchToProps = dispatch => {
             /**
              * storage docs - https://developer.chrome.com/extensions/storage
              */
-            chrome.storage.sync.get("proxy-urls", function(data) {
+            chrome.storage.sync.get("proxy-urls", function (data) {
                 let entries = data["proxy-urls"] || [];
                 entries.push(optionToSave);
                 chrome.storage.sync.set({
@@ -129,14 +140,14 @@ const mapDispatchToProps = dispatch => {
             });
         },
         updateEntry: (option) => {
-            const {filterUrl, redirectUrl} = option;
-            let {index} = option;
+            const { filterUrl, redirectUrl } = option;
+            let { index } = option;
             index = index - 1;
             dispatch({
                 type: "UPDATE_OPTION",
                 data: {
                     index,
-                    option: {filterUrl, redirectUrl}
+                    option: { filterUrl, redirectUrl }
                 }
             });
         },

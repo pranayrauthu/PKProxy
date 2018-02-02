@@ -1,3 +1,8 @@
-<h2>PKProxy</h2>
+# PK Proxy
 
-<p>Adds a panel under devtools. you can add urls to redirect temporarily</p>
+chrome extension for modifying webrequests.
+
+# Features
+
+- request blocking
+- Loading...

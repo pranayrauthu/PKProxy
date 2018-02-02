@@ -2,10 +2,12 @@ import React from "react";
 import OptionsList from "./OptionsList";
 import OptionForm from './OptionForm';
 
+import { Typography } from 'rmwc/Typography';
+
 const App = (props) => {
     return (
         <main>
-            <h3>PK Proxy</h3>
+            <Typography use="headline">PKProxy</Typography>
             <OptionForm />
             <hr/>
             <OptionsList />
