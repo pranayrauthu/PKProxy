@@ -3,6 +3,8 @@ import { connect } from 'react-redux';
 
 import Option from './Option';
 
+import { Grid } from 'rmwc/Grid';
+
 
 class OptionsList extends React.Component {
 
@@ -43,7 +45,7 @@ class OptionsList extends React.Component {
     render() {
         return (
             <div id={"options-table"} onClick={this.handleClick}>
-                {this.loadOptions()}
+                <Grid>{this.loadOptions()}</Grid>
             </div>
         );
     }

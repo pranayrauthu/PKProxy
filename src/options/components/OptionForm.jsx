@@ -1,6 +1,5 @@
 import React from "react";
 import { connect } from 'react-redux';
-import classnames from 'classnames';
 
 import { TextField } from 'rmwc/TextField';
 import { Button } from 'rmwc/Button';
@@ -88,10 +87,12 @@ class OptionForm extends React.Component {
                 value={this.state.index}
                 disabled />
                 <TextField
-                    onChange={(e) => this.updateState(e)}
+                    name="filterUrl"
+                    onChange={this.updateState}
                     value={this.state.filterUrl}
                     label="URL pattern to intercept" />
                 <TextField
+                    name="redirectUrl"
                     onChange={this.updateState}
                     value={this.state.redirectUrl}
                     label="URL to redirect" />
