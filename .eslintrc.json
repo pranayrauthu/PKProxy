@@ -1,0 +1,12 @@
+{
+    "extends": "airbnb",
+    "globals": {
+        "document": true,
+        "chrome": true
+    },
+    "rules": {
+        "linebreak-style": [
+            "error", "windows"
+        ]
+    }
+}
