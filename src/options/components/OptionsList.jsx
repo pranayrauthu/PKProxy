@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Grid } from 'rmwc/Grid';
 import PropTypes from 'prop-types';
+import uuidv1 from 'uuid/v1';
 
 import Option from './Option';
 
@@ -16,7 +17,7 @@ class OptionsList extends React.Component {
     return this.props.options.map((option, i) => (<Option
       filterUrl={option.filterUrl}
       redirectUrl={option.redirectUrl}
-      key={option.id}
+      key={uuidv1()}
       index={i}
     />));
   }
@@ -31,7 +32,7 @@ class OptionsList extends React.Component {
 
     if (target.dataset.type === 'edit') {
       const option = this.props.options
-        .filter((opt, i) => i === target.parentElement.dataset.index)[0];
+        .filter((opt, i) => i.toString() === target.parentElement.dataset.index)[0];
       option.index = target.parentElement.dataset.index;
       this.props.editOption(option);
     }
@@ -59,11 +60,19 @@ const mapDispatchToProps = dispatch => ({
   deleteOption(index) {
     chrome.storage.sync.get('proxy-urls', (data) => {
       let options = data['proxy-urls'] || [];
-      options = options.filter((o, i) => !(i === index));
+      options = options.filter((o, i) => !(i.toString() === index));
       chrome.storage.sync.set({ 'proxy-urls': options }, () => {
         dispatch({
           type: 'DELETE_OPTION',
           index,
+        });
+        dispatch({
+          type: 'NOTIFY',
+          data: {
+            message: 'rule deleted successfully.',
+            timeout: 2000,
+            show: true,
+          },
         });
       });
     });
@@ -92,7 +101,7 @@ const mapDispatchToProps = dispatch => ({
 
 OptionsList.propTypes = {
   loadOptions: PropTypes.func.isRequired,
-  options: PropTypes.func.isRequired,
+  options: PropTypes.arrayOf(PropTypes.object).isRequired,
   deleteOption: PropTypes.func.isRequired,
   editOption: PropTypes.func.isRequired,
 };

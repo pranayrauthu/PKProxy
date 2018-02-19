@@ -37,7 +37,10 @@ class OptionForm extends React.Component {
   addOptionToStore() {
     if (!this.validUrlPattern()) {
       // TODO: show proper error message
-      alert('pls enter valid url pattern');
+      this.props.notify({
+        message: 'plese enter valid url pattern',
+        timeout: 2000,
+      });
       return;
     }
 
@@ -115,7 +118,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  addEntry: (option) => {
+  addEntry(option) {
     const optionToSave = {
       filterUrl: option.filterUrl,
       redirectUrl: option.redirectUrl,
@@ -134,18 +137,35 @@ const mapDispatchToProps = dispatch => ({
           type: 'ADD_OPTION',
           option: optionToSave,
         });
+        dispatch({
+          type: 'NOTIFY',
+          data: {
+            message: 'rule saved successfully.',
+            timeout: 2000,
+            show: true,
+          },
+        });
       });
     });
   },
-  updateEntry: (option) => {
+  updateEntry(option) {
     const { filterUrl, redirectUrl } = option;
     let { index } = option;
     index -= 1;
+    index = index.toString();
     dispatch({
       type: 'UPDATE_OPTION',
       data: {
         index,
         option: { filterUrl, redirectUrl },
+      },
+    });
+    dispatch({
+      type: 'NOTIFY',
+      data: {
+        message: 'rule saved successfully.',
+        timeout: 2000,
+        show: true,
       },
     });
   },
@@ -154,12 +174,23 @@ const mapDispatchToProps = dispatch => ({
       type: 'RESET_FORM',
     });
   },
+  notify({ message, timeout }) {
+    dispatch({
+      type: 'NOTIFY',
+      data: {
+        message,
+        timeout,
+        show: true,
+      },
+    });
+  },
 });
 
 OptionForm.propTypes = {
   updateEntry: PropTypes.func.isRequired,
   addEntry: PropTypes.func.isRequired,
   resetForm: PropTypes.func.isRequired,
+  notify: PropTypes.func.isRequired,
 };
 
 export default connect(

@@ -10,7 +10,7 @@ const Option = props => (
       <div>{props.filterUrl}</div>
       <div>{props.redirectUrl}</div>
       <div data-index={props.index}>
-        <span data-type="edit">edit</span> | <span href="#" data-type="delete">delete</span>
+        <span data-type="edit">edit</span> | <span data-type="delete">delete</span>
       </div>
     </Elevation>
   </GridCell>
